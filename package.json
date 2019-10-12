@@ -1,0 +1,23 @@
+{
+  "name": "artuino",
+  "version": "1.0.0",
+  "description": "Teken met je vinger in de lucht, en een robot zal het natekenen op een blaadje!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ImAmalox/Artuino.git"
+  },
+  "author": "Amalox",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ImAmalox/Artuino/issues"
+  },
+  "homepage": "https://github.com/ImAmalox/Artuino#readme",
+  "dependencies": {
+    "node-webcam": "^0.5.0",
+    "opencv4nodejs": "^5.3.0"
+  }
+}
