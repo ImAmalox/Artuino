@@ -1,32 +1,28 @@
 const cv = require('opencv4nodejs');
 
-const {getPictureBuffer} = require('./webcam');
+const captureSession = new cv.VideoCapture(0);
 
-const lowerBlue = new cv.Vec(120, 0, 0);
-const upperBlue = new cv.Vec(140, 255, 255);
+const lowerGreen = new cv.Vec(40, 52, 70);
+const upperGreen = new cv.Vec(100, 255, 255);
 
 let frame = 0;
+let framerate = 144;
 
 const makeDotMask = (img) => {
     // filter by skin color
     const imgHSV = img.cvtColor(cv.COLOR_BGR2HSV);
-    const flipped = imgHSV.flip(1);
-    const rangeMask = flipped.inRange(lowerBlue, upperBlue);
-    cv.imwrite('./hsv.jpg', imgHSV);
-    // remove noise
-    const blurred = rangeMask.blur(new cv.Size(10, 10));
-    return blurred;
+    const rangeMask = imgHSV.inRange(lowerGreen, upperGreen);
+    let channels = img.splitChannels();
+    let maskedChannels = channels.map(c => c.bitwiseAnd(rangeMask));
+    let output = new cv.Mat(maskedChannels);
+    return output;
 };
 
 setInterval(() => {
-    getPictureBuffer()
-    .then(imgBuffer => {
-        let img = cv.imdecode(imgBuffer);
-        const handMask = makeDotMask(img);
-        cv.imwrite(`./frames/${frame}.jpg`, handMask);
-    })
-    .catch(err => {
-        console.log('bruh ', err);
-    });
+    let frame = captureSession.read(); //read current webcam frame
+    let handMask = makeDotMask(frame);
+    // cv.imwrite(`frame.jpg`, handMask);
+    cv.imshow('Preview', handMask);
+    cv.waitKey(1);
     frame++;
-}, 1000 / 24);
+}, 1000 / framerate);

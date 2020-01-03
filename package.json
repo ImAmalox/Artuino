@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/ImAmalox/Artuino#readme",
   "dependencies": {
+    "camera-capture": "0.0.11",
     "node-webcam": "^0.5.0",
-    "opencv4nodejs": "^5.3.0"
+    "opencv4nodejs": "^5.3.0",
+    "puppeteer": "^2.0.0"
   }
 }
