@@ -1,3 +1,5 @@
 {
-    "":""
+    "port":"/dev/tty.usbserial-70",
+    "PenWidth":"0.8",
+    "StepsPerRev":"800"
 }
