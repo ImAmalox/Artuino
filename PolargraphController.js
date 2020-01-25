@@ -68,6 +68,13 @@ const setup = () => {
             case 'StepsPerRev': sendCommand(commands.CHANGEMACHINESTEPSPERREV, [values[i]]); break;
             case 'MotorMaxSpeed': sendCommand(commands.SETMOTORSPEED, [values[i]]); break;
             case 'HomePoint': sendCommand(commands.SETHOMEPOINT, values[i]); break;
+            case 'MMPerRev': sendCommand(commands.CHANGEMACHINEMMPERREV, values[i]); break;
+            case 'MachineSize': sendCommand(commands.CHANGEMACHINESIZE, values[i]); break;
+            case 'PageSize': sendCommand(commands.CHANGEMACHINESIZE, values[i]); break;
+            case 'PagePosition': sendCommand(commands.SETPOSITION, values[i]); break;
+            case 'PenUpPosition': sendCommand(commands.PENUP, values[i]); break;
+            case 'PenDownPosition': sendCommand(commands.PENDOWN, values[i]); break;
+            case 'MotorAcceleration': sendCommand(commands.SETMOTORACCEL, values[i]); break;
 
         }
     }

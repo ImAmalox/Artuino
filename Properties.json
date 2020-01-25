@@ -2,8 +2,13 @@
     "port":"/dev/tty.usbserial-70",
     "PenWidth":"0.8",
     "StepsPerRev":"800",
-    "MotorMaxSpeed":"54",
+    "MotorMaxSpeed":"600",
     "HomePoint":["230", "120"],
     "MMPerRev":"32",
-    "StepMultiplier":"1"
+    "MachineSize":["460","705"],
+    "PageSize":["460","705"],
+    "PagePosition":["0","0"],
+    "PenUpPosition":"180",
+    "PenDownPosition":"90",
+    "MotorAcceleration":"400"
 }
