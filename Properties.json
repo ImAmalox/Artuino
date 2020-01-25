@@ -1,5 +1,7 @@
 {
     "port":"/dev/tty.usbserial-70",
     "PenWidth":"0.8",
-    "StepsPerRev":"800"
+    "StepsPerRev":"800",
+    "MotorMaxSpeed":"54",
+    "HomePoint":["230", "120"]
 }

@@ -66,6 +66,9 @@ const setup = () => {
         switch(properties[i]) {
             case 'PenWidth': sendCommand(commands.CHANGEPENWIDTH, [values[i]]); break;
             case 'StepsPerRev': sendCommand(commands.CHANGEMACHINESTEPSPERREV, [values[i]]); break;
+            case 'MotorMaxSpeed': sendCommand(commands.SETMOTORSPEED, [values[i]]); break;
+            case 'HomePoint': sendCommand(commands.SETPOSITION, [values[i][0], values[i][1]]); break;
+
         }
     }
 }
