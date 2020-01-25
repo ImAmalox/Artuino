@@ -3,5 +3,7 @@
     "PenWidth":"0.8",
     "StepsPerRev":"800",
     "MotorMaxSpeed":"54",
-    "HomePoint":["230", "120"]
+    "HomePoint":["230", "120"],
+    "MMPerRev":"32",
+    "StepMultiplier":"1"
 }
