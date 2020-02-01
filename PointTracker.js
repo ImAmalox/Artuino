@@ -73,7 +73,6 @@ const drawObjectContrail = image => {
             image.drawLine(drawPoints[i-1], drawPoints[i], new cv.Vec3(255, 0, 0), 2);
         }
     }
-    console.log(drawPoints[drawPoints.length-1]);
     return image;
 };
 

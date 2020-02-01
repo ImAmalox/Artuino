@@ -46,7 +46,7 @@ parser.on('data', data => {
     switch(data) {
         case 'STARTUP': console.log(`${ARD_PREFIX} Connected and Polargraph started successfully`.green); setup(); break;
         case 'EXEC_OK': 
-        console.log(`${ARD_PREFIX} Command '${lastCommand}' executed successfully`.green);
+        // console.log(`${ARD_PREFIX} Command '${lastCommand}' executed successfully`.green);
         allExecuted = true;
         break;
         case 'EXEC_ABORT':
@@ -112,8 +112,8 @@ const setup = () => {
         }
     }
     prepareQueue();
-    squareTest();
-    // swastikaTest();
+    // squareTest();
+    swastikaTest();
 };
 
 const prepareQueue = () => {
@@ -145,6 +145,7 @@ const squareTest = () => {
     addToQueue(commands.CHANGELENGTHDIRECT, utils.asNativeCoords(-50,100, true));
     addToQueue(commands.CHANGELENGTHDIRECT, utils.asNativeCoords(-50,0, true));
     addToQueue(commands.CHANGELENGTHDIRECT, utils.asNativeCoords(0,0, true));
+    addToQueue(commands.PENUP, null);
 };
 
 const swastikaTest = () => {
