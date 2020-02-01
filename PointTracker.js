@@ -1,22 +1,36 @@
+require('colors');
+
 const cv = require('opencv4nodejs');
+const EventEmitter = require('events');
 
 //Activate and configure the webcam
+const fs = require('fs');
+const config = JSON.parse(fs.readFileSync('./Properties.json', 'utf8'));
 let captureSession = new cv.VideoCapture(0);
-captureSession.set(cv.CAP_PROP_FRAME_WIDTH, 640);
-captureSession.set(cv.CAP_PROP_FRAME_HEIGHT, 480);
+captureSession.set(cv.CAP_PROP_FRAME_WIDTH, parseInt(config.Resolution[1]));
+captureSession.set(cv.CAP_PROP_FRAME_HEIGHT, parseInt(config.Resolution[0]));
 
 //Color ranges for the object to be tracked, in HSV format
 const lowerColor = new cv.Vec(23, 90, 70);
 const upperColor = new cv.Vec(122, 255, 255);
 
 //Framerate of the tracker, a minimum of 30 is recommended
-const framerate = 144;
+const framerate = 30;
 
 //List of every point the object went past
 const hitPoints = [];
 
 //Max length of the contrail the object produces, -1 = infinite
-const maxContrail = 10;
+const maxContrail = -1;
+
+//EventEmitter for the points
+const communicator = new EventEmitter();
+
+//Pause the tracker?
+let paused = true;
+
+//Prefix for logging
+const NODE_PREFIX = '[PointTracker]';
 
 //Create a mask of the object to be tracked
 const createMask = img => {
@@ -80,34 +94,59 @@ const drawObjectContrail = image => {
 const handleFrame = () => {
     //Get current frame from webcam
     let frame = captureSession.read();
+    //Rotate frame so it's in portrait mode
+    frame = frame.rotate(cv.ROTATE_90_CLOCKWISE);
+
     let finalFrame = frame;
-    //Create mask of current frame
-    let mask = createMask(frame);
-    //Get contour of the largest area of the mask
-    let contour = getContour(mask);
-    //If no object has been found, add an empty point to the list
-    if(!contour) {
-        //Add an empty point to the list
-        hitPoints.push(new cv.Point2(-1, -1));
-    //If an object has been found, draw a circle and add it's position to the list of hit points
+
+    //If the tracker is on, try to track a point
+    if(!paused) {
+        //Create mask of the current frame
+        let mask = createMask(frame);
+        //Get contour of the largest area of the mask
+        let contour = getContour(mask);
+        //If no object has been found, add an empty point to the list
+        if(!contour) {
+            //Add an empty point to the list
+            hitPoints.push(new cv.Point2(-1, -1));
+            communicator.emit('empty');
+        //If an object has been found, draw a circle and add it's position to the list of hit points
+        }else{
+            //Get object's position in the screen
+            let position = getObjectPosition(contour);
+            //Draw a circle on the current frame, based on the object's position and size
+            finalFrame = drawObjectCircle(frame, contour, position);
+            //Add the point to the list
+            hitPoints.push(position);
+            communicator.emit('point', position);
+        }
     }else{
-        //Get object's position in the screen
-        let position = getObjectPosition(contour);
-        //Draw a circle on the current frame, based on the object's position and size
-        finalFrame = drawObjectCircle(frame, contour, position);
-        //Add the point to the list
-        hitPoints.push(position);
+        hitPoints.push(new cv.Point2(-1, -1));
+        communicator.emit('empty');
     }
     //If we have hit points, draw a contrail
     if(hitPoints.length > 0) {
         //Draw the contrail based on the hit points
         finalFrame = drawObjectContrail(frame);
     }
+    
     //Show the feed and mask on screen
     cv.imshow('Tracking feed', finalFrame);
-    cv.imshow('Mask', mask);
     cv.waitKey(1);
 };
 
-//Create a loop to perform actions every frame
-setInterval(handleFrame, 1000 / framerate);
+const startTracker = () => {
+    console.log(`${NODE_PREFIX} Starting point tracking`.green);
+    paused = false;
+    communicator.emit('pauseChange', paused);
+};
+
+const stopTracker = () => {
+    console.log(`${NODE_PREFIX} Stopping point tracking`.red);
+    paused = true;
+    communicator.emit('pauseChange', paused);
+};
+
+setInterval(() => handleFrame(), 1000 / framerate);
+
+module.exports = {communicator, startTracker, stopTracker, paused};

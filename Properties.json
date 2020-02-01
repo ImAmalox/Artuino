@@ -8,5 +8,6 @@
     "StepsPerRev":"400",
     "MMPerRev":"32",
     "MachineSize":["460","705"],
-    "HomePoint":["230", "280"]
+    "HomePoint":["230", "280"],
+    "Resolution":["480", "640"]
 }
