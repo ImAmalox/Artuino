@@ -145,7 +145,7 @@ const processQueue = () => {
 
 const returnHome = killQueue => {
     if(killQueue) queue = [];
-    if(!penIsUp) penUp();
+    penUp();
     moveFast(0, 0);
 };
 
@@ -183,4 +183,52 @@ const squareTest = () => {
     penUp();
 };
 
-module.exports = {moveDirect, returnHome, penIsUp, penUp, penDown, machineOn, squareTest, communicator};
+const squareAccuracyTest = () => {
+    //Draws 2 squares over each other
+    console.log(`${NODE_PREFIX} Attempting to draw 2 squares over each other`.blue);
+    penDown();
+    moveDirect(50,0);
+    moveDirect(50,100);
+    moveDirect(-50,100);
+    moveDirect(-50,0);
+    moveDirect(0,0);
+    moveDirect(100, 250);
+    moveDirect(0,0);
+    moveDirect(50,0);
+    moveDirect(50,100);
+    moveDirect(-50,100);
+    moveDirect(-50,0);
+    moveDirect(0,0);
+    penUp();
+};
+
+const servoTest = () => {
+    //Draws 2 squares over each other, lifting the pen up in between
+    console.log(`${NODE_PREFIX} Attempting to draw 2 squares over each other with pen lift`.blue);
+    penDown();
+    moveDirect(50,0);
+    moveDirect(50,100);
+    moveDirect(-50,100);
+    moveDirect(-50,0);
+    moveDirect(0,0);
+    penUp();
+    moveDirect(100, 250);
+    penDown();
+    penUp();
+    moveDirect(0,0);
+    penDown();
+    moveDirect(50,0);
+    moveDirect(50,100);
+    moveDirect(-50,100);
+    moveDirect(-50,0);
+    moveDirect(0,0);
+    penUp();
+}
+
+const repeatedServoTest = () => {
+    for(let i = 0; i < 30; ++i) {
+        penUp();
+        penDown();
+    }
+};
+module.exports = {moveDirect, returnHome, penIsUp, penUp, penDown, machineOn, squareTest, squareAccuracyTest, servoTest, repeatedServoTest, communicator};

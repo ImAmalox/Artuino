@@ -1,13 +1,15 @@
 {
-    "port":"/dev/tty.usbserial-70",
+    "port":"/dev/tty.usbserial-D0",
     "PenWidth":"0.8",
     "MotorMaxSpeed":"600.0",
-    "MotorAcceleration":"400.0",
+    "MotorAcceleration":"300.0",
     "PenUpPosition":"180",
     "PenDownPosition":"90",
     "StepsPerRev":"400",
     "MMPerRev":"32",
-    "MachineSize":["460","705"],
-    "HomePoint":["230", "280"],
-    "Resolution":["480", "640"]
+    "MachineSize":["390","520"],
+    "HomePoint":["195", "230"],
+    "Resolution":["480", "640"],
+    "LowerColorRange":[32, 27, 0],
+    "UpperColorRange":[70, 255, 255]
 }

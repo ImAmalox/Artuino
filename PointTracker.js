@@ -11,14 +11,16 @@ captureSession.set(cv.CAP_PROP_FRAME_WIDTH, parseInt(config.Resolution[1]));
 captureSession.set(cv.CAP_PROP_FRAME_HEIGHT, parseInt(config.Resolution[0]));
 
 //Color ranges for the object to be tracked, in HSV format
-const lowerColor = new cv.Vec(23, 90, 70);
-const upperColor = new cv.Vec(122, 255, 255);
+const lowerColor = config.LowerColorRange || [23, 90, 70];
+const upperColor = config.UpperColorRange || [122, 255, 255];
+const lowerVector = new cv.Vec(lowerColor[0], lowerColor[1], lowerColor[2]);
+const upperVector = new cv.Vec(upperColor[0], upperColor[1], upperColor[2]);
 
 //Framerate of the tracker, a minimum of 30 is recommended
 const framerate = 30;
 
 //List of every point the object went past
-const hitPoints = [];
+let hitPoints = [];
 
 //Max length of the contrail the object produces, -1 = infinite
 const maxContrail = -1;
@@ -28,6 +30,12 @@ const communicator = new EventEmitter();
 
 //Pause the tracker?
 let paused = true;
+
+//Show the mask in the preview? Activated by specifying 'mask' as an argument
+let maskOn = false;
+
+//Flip the webcam feed vertically? Activated by specifying 'vflip' as an argument
+let verticalFlip = false;
 
 //Prefix for logging
 const NODE_PREFIX = '[PointTracker]';
@@ -39,7 +47,7 @@ const createMask = img => {
     //Convert image to HSV color format
     const imgHSV = blurred.cvtColor(cv.COLOR_BGR2HSV);
     //Create the mask based on the color range specified above
-    let mask = imgHSV.inRange(lowerColor, upperColor);
+    let mask = imgHSV.inRange(lowerVector, upperVector);
     //Remove most remaining noise blobs
     mask = mask.erode(new cv.Mat(), new cv.Point(-1, -1,), 2);
     mask = mask.dilate(new cv.Mat(), new cv.Point(-1, -1,), 2);
@@ -95,35 +103,39 @@ const handleFrame = () => {
     //Get current frame from webcam
     let frame = captureSession.read();
     //Rotate frame so it's in portrait mode
-    frame = frame.rotate(cv.ROTATE_90_CLOCKWISE);
+    frame = frame.rotate(verticalFlip ? cv.ROTATE_90_COUNTERCLOCKWISE : cv.ROTATE_90_CLOCKWISE);
 
     let finalFrame = frame;
 
-    //If the tracker is on, try to track a point
-    if(!paused) {
-        //Create mask of the current frame
-        let mask = createMask(frame);
-        //Get contour of the largest area of the mask
-        let contour = getContour(mask);
-        //If no object has been found, add an empty point to the list
-        if(!contour) {
-            //Add an empty point to the list
+    //Create mask of the current frame
+    let mask = createMask(frame);
+    //Get contour of the largest area of the mask
+    let contour = getContour(mask);
+    //If no object has been found, add an empty point to the list
+    if(!contour) {
+        //Add an empty point to the list if the tracker is on
+        if(!paused) {
             hitPoints.push(new cv.Point2(-1, -1));
             communicator.emit('empty');
-        //If an object has been found, draw a circle and add it's position to the list of hit points
-        }else{
-            //Get object's position in the screen
-            let position = getObjectPosition(contour);
-            //Draw a circle on the current frame, based on the object's position and size
-            finalFrame = drawObjectCircle(frame, contour, position);
-            //Add the point to the list
+        }
+    //If an object has been found, draw a circle and add it's position to the list of hit points
+    }else{
+        //Get object's position in the screen
+        let position = getObjectPosition(contour);
+        //Draw a circle on the current frame, based on the object's position and size
+        finalFrame = drawObjectCircle(frame, contour, position);
+        //Add the point to the list if the tracker is on
+        if(!paused) {
             hitPoints.push(position);
             communicator.emit('point', position);
         }
-    }else{
+    }
+
+    if(paused) {
         hitPoints.push(new cv.Point2(-1, -1));
         communicator.emit('empty');
     }
+    
     //If we have hit points, draw a contrail
     if(hitPoints.length > 0) {
         //Draw the contrail based on the hit points
@@ -132,6 +144,7 @@ const handleFrame = () => {
     
     //Show the feed and mask on screen
     cv.imshow('Tracking feed', finalFrame);
+    if(maskOn) cv.imshow('Mask', mask);
     cv.waitKey(1);
 };
 
@@ -147,6 +160,22 @@ const stopTracker = () => {
     communicator.emit('pauseChange', paused);
 };
 
+const clearPoints = () => {
+    hitPoints = [];
+};
+
+const setMaskOn = () => {
+    maskOn = true;
+};
+
+const setVerticalFlipOn = () => {
+    verticalFlip = true;
+};
+
+const setHitPoints = points => {
+    hitPoints = points;
+};
+
 setInterval(() => handleFrame(), 1000 / framerate);
 
-module.exports = {communicator, startTracker, stopTracker, paused};
+module.exports = {communicator, startTracker, stopTracker, clearPoints, setMaskOn, setVerticalFlipOn, setHitPoints, hitPoints, paused};
