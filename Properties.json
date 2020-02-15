@@ -1,8 +1,8 @@
 {
     "port":"/dev/tty.usbserial-D0",
     "PenWidth":"0.8",
-    "MotorMaxSpeed":"600.0",
-    "MotorAcceleration":"300.0",
+    "MotorMaxSpeed":"400.0",
+    "MotorAcceleration":"500.0",
     "PenUpPosition":"180",
     "PenDownPosition":"90",
     "StepsPerRev":"400",
